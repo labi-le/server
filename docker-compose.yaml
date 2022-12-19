@@ -1,0 +1,14 @@
+version: "3.3"
+services:
+  web:
+    hostname: labile.cc
+    image: alpine:latest
+    entrypoint: ./app/labile-me-serv
+    environment:
+      - TZ=Europe/Moscow
+    volumes:
+      - ./:/app:rw
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
