@@ -13,7 +13,6 @@ import (
 	"labile-me-serv/pkg/config"
 	"labile-me-serv/pkg/filesystem"
 	"labile-me-serv/pkg/log"
-	"time"
 )
 
 func main() {
@@ -31,8 +30,6 @@ func main() {
 	r := fiber.New(fiber.Config{
 		DisableStartupMessage: false,
 		BodyLimit:             cfg.GetMaxUploadSize(),
-		ReadTimeout:           time.Minute * 5,
-		WriteTimeout:          time.Minute * 30,
 	})
 
 	r.Use(log.LoggerMiddleware(logger))
