@@ -117,7 +117,7 @@ func (r *resource) Get(ctx *fiber.Ctx) error {
 }
 
 func (r *resource) Version(ctx *fiber.Ctx) error {
-	return r.reply.OK(ctx, fiber.Map{"version": internal.BuildVersion()})
+	return r.reply.OK(ctx, internal.BuildVersion())
 }
 
 func (r *resource) HomePage(ctx *fiber.Ctx) error {

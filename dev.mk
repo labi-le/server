@@ -3,6 +3,8 @@ CONTOUR = dev
 include .env.$(CONTOUR)
 export $(shell sed 's/=.*//' .env.$(CONTOUR))
 
+GIT=github.com/labi-le/server
+
 PACKAGE = server
 
 MAIN_PATH = cmd/main.go
@@ -13,9 +15,9 @@ VERSION=$(shell git describe --tags --always --abbrev=0 --match='v[0-9]*.[0-9]*.
 COMMIT_HASH=$(shell git rev-parse --short HEAD)
 BUILD_TIMESTAMP=$(shell date '+%Y-%m-%dT%H:%M:%S')
 
-LDFLAGS=-ldflags="-X '${PACKAGE}/internal.Version=${VERSION}' \
-                   -X '${PACKAGE}/internal.CommitHash=${COMMIT_HASH}' \
-                   -X '${PACKAGE}/internal.BuildTime=${BUILD_TIMESTAMP}' \
+LDFLAGS=-ldflags="-X '${GIT}/internal.version=${VERSION}' \
+                   -X '${GIT}/internal.commitHash=${COMMIT_HASH}' \
+                   -X '${GIT}/internal.buildTime=${BUILD_TIMESTAMP}' \
                    -extldflags '-static'"
 
 .DEFAULT_GOAL := build
