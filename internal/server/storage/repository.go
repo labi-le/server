@@ -1,4 +1,4 @@
-package file
+package storage
 
 import (
 	"fmt"
@@ -6,9 +6,18 @@ import (
 	"io"
 )
 
-var ErrInvalidArgument = fmt.Errorf("invalid argument")
-var ErrFileExists = fmt.Errorf("file already exists")
-var ErrFileNotFound = fmt.Errorf("file not found")
+var (
+	ErrInvalidArgument = fmt.Errorf("invalid argument")
+	ErrFileExists      = fmt.Errorf("file already exists")
+	ErrFileNotFound    = fmt.Errorf("file not found")
+)
+
+type File struct {
+	Name        string `json:"name"`
+	ShortID     string `json:"short_id"`
+	ContentType string `json:"content_type"`
+	io.Reader   `json:"-"`
+}
 
 // Store is an abstraction for different key-value store implementations.
 // A store must be able to store, retrieve and delete key-value pairs,

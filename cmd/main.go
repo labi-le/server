@@ -6,11 +6,13 @@ import (
 	"github.com/dgraph-io/badger/options"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/favicon"
-	"github.com/labi-le/server/internal/file"
+	"github.com/labi-le/server/internal/server/basic"
+	"github.com/labi-le/server/internal/server/storage"
 	"github.com/labi-le/server/pkg/badgerdb"
 	"github.com/labi-le/server/pkg/config"
 	"github.com/labi-le/server/pkg/filesystem"
 	"github.com/labi-le/server/pkg/log"
+	"github.com/labi-le/server/pkg/response"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/acme/autocert"
 )
@@ -20,13 +22,37 @@ func main() {
 	flag.BoolVar(&debugMode, "debug", false, "debug mode")
 	flag.Parse()
 
+	cfg := MustConfig()
+
+	logger := MustLogger(debugMode, cfg.GetLogLevel())
+
+	server := MustServer(cfg, logger)
+
+	reply := response.New(logger)
+	MustBasic(server, reply)
+
+	store := MustStorage(server, logger, cfg, reply)
+	defer store.Close()
+
+	if cfg.GetEnableHTTPS() {
+		go UpTLSServer(logger, server, cfg)
+	}
+
+	if httpServerErr := server.Listen(cfg.GetServerConn()); httpServerErr != nil {
+		logger.Warn(httpServerErr)
+	}
+
+}
+
+func MustConfig() config.Config {
 	cfg, err := config.NewFromENV()
 	if err != nil {
 		panic(err)
 	}
+	return cfg
+}
 
-	logger := GetLogger(debugMode, cfg.GetLogLevel())
-
+func MustServer(cfg config.Config, logger log.Logger) *fiber.App {
 	r := fiber.New(fiber.Config{
 		DisableStartupMessage: false,
 		BodyLimit:             cfg.GetMaxUploadSize(),
@@ -46,6 +72,14 @@ func main() {
 		File: "favicon.ico",
 	}))
 
+	return r
+}
+
+func MustBasic(r *fiber.App, reply *response.Reply) {
+	basic.RegisterHandlers(r, reply)
+}
+
+func MustStorage(r *fiber.App, log log.Logger, cfg config.Config, reply *response.Reply) badgerdb.Store {
 	defaultOpt := badger.DefaultOptions("db")
 	defaultOpt.SyncWrites = false
 	defaultOpt.TableLoadingMode = options.LoadToRAM
@@ -54,25 +88,21 @@ func main() {
 	db, dbErr := badger.Open(defaultOpt)
 	client := badgerdb.NewWithBadger(db)
 	if dbErr != nil {
-		logger.Error(dbErr)
+		log.Error(dbErr)
 	}
 
-	defer db.Close()
+	storage.RegisterHandlers(
+		r,
+		storage.NewService(
+			storage.NewStore(client,
+				filesystem.New(cfg.GetVirtualFSPath()),
+			),
+		),
+		cfg.GetOwnerKey(),
+		reply,
+	)
 
-	fs := filesystem.New(cfg.GetVirtualFSPath())
-
-	store := file.NewStore(client, fs)
-
-	file.RegisterHandlers(r, logger, file.NewService(store), cfg)
-
-	if cfg.GetEnableHTTPS() {
-		go UpTLSServer(logger, r, cfg)
-	}
-
-	if httpServerErr := r.Listen(cfg.GetServerConn()); httpServerErr != nil {
-		logger.Warn(httpServerErr)
-	}
-
+	return client
 }
 
 func UpTLSServer(logger log.Logger, r *fiber.App, cfg config.Config) {
@@ -85,9 +115,9 @@ func UpTLSServer(logger log.Logger, r *fiber.App, cfg config.Config) {
 	}()
 }
 
-// GetLogger returns a logger based on the given parameters.
+// MustLogger returns a logger based on the given parameters.
 // see zapcore.level
-func GetLogger(debug bool, level string) log.Logger {
+func MustLogger(debug bool, level string) log.Logger {
 	if level == "disable" {
 		return log.NilLogger{}
 	}
@@ -106,7 +136,10 @@ func GetLogger(debug bool, level string) log.Logger {
 	}
 
 	// create logger
-	l, _ := zap.NewProduction()
+	l, prodErr := zap.NewProduction()
+	if prodErr != nil {
+		panic(prodErr)
+	}
 	l.Core().Enabled(atomicLevel.Level())
 
 	return log.NewWithZap(l)

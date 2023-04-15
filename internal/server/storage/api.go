@@ -1,12 +1,11 @@
-package file
+package storage
 
 import (
 	"errors"
 	"github.com/gofiber/fiber/v2"
-	"github.com/labi-le/server/internal"
-	"github.com/labi-le/server/pkg/config"
 	"github.com/labi-le/server/pkg/log"
 	"github.com/labi-le/server/pkg/response"
+	"io"
 	"net/http"
 	"time"
 )
@@ -15,18 +14,30 @@ var (
 	ErrInvalidForm = errors.New("invalid form")
 	ErrEmptyFile   = errors.New("file is empty")
 	ErrInvalidKey  = errors.New("invalid key")
+	ErrInvalidURL  = errors.New("keyword is not available")
 )
 
-func RegisterHandlers(r fiber.Router, l log.Logger, s Service, c config.Config) {
+var invalidURLs = []string{
+	"favicon.ico",
+	"robots.txt",
+	"version",
+	"index",
+}
+
+type RequestFile struct {
+	ShortID     string `json:"short_id"`
+	Name        string `json:"name"`
+	ContentType string `json:"content_type"`
+	io.Reader
+}
+
+func RegisterHandlers(r fiber.Router, s Service, ownerKey string, reply *response.Reply) {
 	res := &resource{
-		log:      l,
 		s:        s,
-		reply:    response.New(l),
-		ownerKey: c.GetOwnerKey(),
+		reply:    reply,
+		ownerKey: ownerKey,
 	}
 
-	r.Get("/", res.HomePage)
-	r.Get("version", res.Version)
 	r.Put("*", res.Upload)
 	r.Get("*", res.Get)
 }
@@ -44,6 +55,10 @@ func (r *resource) Upload(ctx *fiber.Ctx) error {
 	if customURL != "" {
 		if !checkKey(ctx, r.ownerKey) {
 			return r.reply.Unauthorized(ctx, ErrInvalidKey)
+		}
+
+		if !checkAvailableURL(customURL) {
+			return r.reply.BadRequest(ctx, ErrInvalidURL)
 		}
 
 	} else {
@@ -116,14 +131,16 @@ func (r *resource) Get(ctx *fiber.Ctx) error {
 		SendStream(file)
 }
 
-func (r *resource) Version(ctx *fiber.Ctx) error {
-	return r.reply.OK(ctx, internal.BuildVersion())
-}
-
-func (r *resource) HomePage(ctx *fiber.Ctx) error {
-	return r.reply.OK(ctx, "privet")
-}
-
 func checkKey(ctx *fiber.Ctx, key string) bool {
 	return ctx.Get("authorization") == key
+}
+
+func checkAvailableURL(url string) bool {
+	for _, v := range invalidURLs {
+		if v == url {
+			return false
+		}
+	}
+
+	return true
 }

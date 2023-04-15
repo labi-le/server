@@ -1,4 +1,4 @@
-PUT http://127.0.0.1:8000/aa
+PUT http://127.0.0.1:8000/version
 Content-Type: multipart/form-data; boundary=boundary
 Authorization: chupapi
 
