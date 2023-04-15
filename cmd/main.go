@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"github.com/dgraph-io/badger"
 	"github.com/dgraph-io/badger/options"
@@ -22,14 +23,14 @@ func main() {
 	flag.BoolVar(&debugMode, "debug", false, "debug mode")
 	flag.Parse()
 
-	cfg := MustConfig()
+	cfg := MustConfig(context.Background())
 
 	logger := MustLogger(debugMode, cfg.GetLogLevel())
 
 	server := MustServer(cfg, logger)
 
 	reply := response.New(logger)
-	MustBasic(server, reply)
+	MustBasic(server, reply, cfg.GetDiscordLink())
 
 	store := MustStorage(server, logger, cfg, reply)
 	defer store.Close()
@@ -44,8 +45,8 @@ func main() {
 
 }
 
-func MustConfig() config.Config {
-	cfg, err := config.NewFromENV()
+func MustConfig(ctx context.Context) config.Config {
+	cfg, err := config.NewFromENV(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -75,8 +76,8 @@ func MustServer(cfg config.Config, logger log.Logger) *fiber.App {
 	return r
 }
 
-func MustBasic(r *fiber.App, reply *response.Reply) {
-	basic.RegisterHandlers(r, reply)
+func MustBasic(r *fiber.App, reply *response.Reply, link string) {
+	basic.RegisterHandlers(r, reply, link)
 }
 
 func MustStorage(r *fiber.App, log log.Logger, cfg config.Config, reply *response.Reply) badgerdb.Store {

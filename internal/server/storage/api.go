@@ -22,6 +22,7 @@ var invalidURLs = []string{
 	"robots.txt",
 	"version",
 	"index",
+	"discord",
 }
 
 type RequestFile struct {

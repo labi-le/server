@@ -14,6 +14,7 @@ type Config interface {
 	GetOwnerKey() string
 	GetEnableHTTPS() bool
 	GetMaxUploadSize() int
+	GetDiscordLink() string
 }
 
 type config struct {
@@ -26,11 +27,13 @@ type config struct {
 	OwnerKey         string   `env:"OWNER_KEY, required"`
 	EnableHTTPS      bool     `env:"ENABLE_HTTPS, required"`
 	MaxUploadSize    int      `env:"MAX_UPLOAD_SIZE, required"`
+
+	DiscordLink string `env:"DISCORD_LINK, required"`
 }
 
-func NewFromENV() (Config, error) {
+func NewFromENV(ctx context.Context) (Config, error) {
 	c := &config{}
-	if err := envconfig.Process(context.Background(), c); err != nil {
+	if err := envconfig.Process(ctx, c); err != nil {
 		return c, err
 	}
 	return c, nil
@@ -62,4 +65,8 @@ func (c *config) GetEnableHTTPS() bool {
 
 func (c *config) GetMaxUploadSize() int {
 	return c.MaxUploadSize
+}
+
+func (c *config) GetDiscordLink() string {
+	return c.DiscordLink
 }
