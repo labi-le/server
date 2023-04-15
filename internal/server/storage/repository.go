@@ -16,6 +16,7 @@ type File struct {
 	Name        string `json:"name"`
 	ShortID     string `json:"short_id"`
 	ContentType string `json:"content_type"`
+	Size        int64  `json:"size"`
 	io.Reader   `json:"-"`
 }
 

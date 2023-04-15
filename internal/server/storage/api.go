@@ -5,7 +5,6 @@ import (
 	"github.com/gofiber/fiber/v2"
 	"github.com/labi-le/server/pkg/log"
 	"github.com/labi-le/server/pkg/response"
-	"io"
 	"net/http"
 	"time"
 )
@@ -25,12 +24,7 @@ var invalidURLs = []string{
 	"discord",
 }
 
-type RequestFile struct {
-	ShortID     string `json:"short_id"`
-	Name        string `json:"name"`
-	ContentType string `json:"content_type"`
-	io.Reader
-}
+type RequestFile File
 
 func RegisterHandlers(r fiber.Router, s Service, ownerKey string, reply *response.Reply) {
 	res := &resource{
@@ -97,6 +91,7 @@ func (r *resource) Upload(ctx *fiber.Ctx) error {
 		ContentType: contentType.String(),
 		//ContentType: "jpeg",
 		Reader: mpFile,
+		Size:   header.Size,
 	}
 
 	add, sErr := r.s.Add(ctx.Context(), req)
@@ -125,11 +120,11 @@ func (r *resource) Get(ctx *fiber.Ctx) error {
 		return r.reply.NotFound(ctx, err)
 	}
 
-	ctx.Set("Content-Type", file.ContentType)
+	ctx.Set(fiber.HeaderContentType, file.ContentType)
 
 	return ctx.
 		Status(http.StatusOK).
-		SendStream(file)
+		SendStream(file, int(file.Size))
 }
 
 func checkKey(ctx *fiber.Ctx, key string) bool {
