@@ -1,3 +1,8 @@
+CONTOUR = dev
+
+include .env.$(CONTOUR)
+export $(shell sed 's/=.*//' .env.$(CONTOUR))
+
 PACKAGE = labile-serv
 
 MAIN_PATH = cmd/main.go
@@ -16,6 +21,9 @@ LDFLAGS=-ldflags="-X '${PACKAGE}/internal.Version=${VERSION}' \
 .DEFAULT_GOAL := build
 build: clean tests
 	go build ${LDFLAGS} -v -o $(BUILD_PATH)$(PACKAGE) $(MAIN_PATH)
+
+run:
+	go run $(MAIN_PATH)
 
 clean:
 	@rm -rf $(BUILD_PATH)*
