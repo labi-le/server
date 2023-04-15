@@ -42,13 +42,13 @@ func (s Store) Set(k string, v interface{}) error {
 // that v points to with the values of the retrieved object's values.
 // If no value is found it returns (false, nil).
 // The key must not be "" and the pointer must not be nil.
-func (s Store) Get(k string, v interface{}) (found bool, err error) {
+func (s Store) Get(k string, v interface{}) (bool, error) {
 	if err := util.CheckKeyAndValue(k, v); err != nil {
 		return false, err
 	}
 
 	var data []byte
-	err = s.db.View(func(txn *badger.Txn) error {
+	err := s.db.View(func(txn *badger.Txn) error {
 		item, err := txn.Get([]byte(k))
 		if err != nil {
 			return err
