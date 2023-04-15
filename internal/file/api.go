@@ -3,6 +3,7 @@ package file
 import (
 	"errors"
 	"github.com/gofiber/fiber/v2"
+	"labile-me-serv/internal"
 	"labile-me-serv/pkg/config"
 	"labile-me-serv/pkg/log"
 	"labile-me-serv/pkg/response"
@@ -24,6 +25,8 @@ func RegisterHandlers(r fiber.Router, l log.Logger, s Service, c config.Config) 
 		ownerKey: c.GetOwnerKey(),
 	}
 
+	r.Get("/", res.HomePage)
+	r.Get("version", res.Version)
 	r.Put("*", res.Upload)
 	r.Get("*", res.Get)
 }
@@ -111,6 +114,14 @@ func (r *resource) Get(ctx *fiber.Ctx) error {
 	return ctx.
 		Status(http.StatusOK).
 		SendStream(file)
+}
+
+func (r *resource) Version(ctx *fiber.Ctx) error {
+	return r.reply.OK(ctx, fiber.Map{"version": internal.BuildVersion()})
+}
+
+func (r *resource) HomePage(ctx *fiber.Ctx) error {
+	return r.reply.OK(ctx, "privet")
 }
 
 func checkKey(ctx *fiber.Ctx, key string) bool {
