@@ -7,7 +7,6 @@ import (
 )
 
 type Config interface {
-	GetDBName() string
 	GetServerConn() string
 	GetLogLevel() string
 	GetWhiteListDomains() []string
@@ -18,8 +17,6 @@ type Config interface {
 }
 
 type config struct {
-	DBName string `env:"DB_NAME, required"`
-
 	ServerHost string `env:"SERVER_HOST, required"`
 	ServerPort int    `env:"SERVER_PORT, required"`
 
@@ -37,10 +34,6 @@ func NewFromENV() (Config, error) {
 		return c, err
 	}
 	return c, nil
-}
-
-func (c *config) GetDBName() string {
-	return c.DBName
 }
 
 func (c *config) GetServerConn() string {
