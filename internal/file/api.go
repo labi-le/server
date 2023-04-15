@@ -3,10 +3,10 @@ package file
 import (
 	"errors"
 	"github.com/gofiber/fiber/v2"
-	"labile-me-serv/internal"
-	"labile-me-serv/pkg/config"
-	"labile-me-serv/pkg/log"
-	"labile-me-serv/pkg/response"
+	"github.com/labi-le/server/internal"
+	"github.com/labi-le/server/pkg/config"
+	"github.com/labi-le/server/pkg/log"
+	"github.com/labi-le/server/pkg/response"
 	"net/http"
 	"time"
 )

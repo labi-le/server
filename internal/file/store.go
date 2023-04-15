@@ -2,8 +2,8 @@ package file
 
 import (
 	"fmt"
+	"github.com/labi-le/server/pkg/filesystem"
 	"io"
-	"labile-me-serv/pkg/filesystem"
 )
 
 var ErrInvalidArgument = fmt.Errorf("invalid argument")

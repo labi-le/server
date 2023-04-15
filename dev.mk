@@ -3,7 +3,7 @@ CONTOUR = dev
 include .env.$(CONTOUR)
 export $(shell sed 's/=.*//' .env.$(CONTOUR))
 
-PACKAGE = labile-serv
+PACKAGE = server
 
 MAIN_PATH = cmd/main.go
 BUILD_PATH = build/package/

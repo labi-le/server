@@ -6,13 +6,13 @@ import (
 	"github.com/dgraph-io/badger/options"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/favicon"
+	"github.com/labi-le/server/internal/file"
+	"github.com/labi-le/server/pkg/badgerdb"
+	"github.com/labi-le/server/pkg/config"
+	"github.com/labi-le/server/pkg/filesystem"
+	"github.com/labi-le/server/pkg/log"
 	"go.uber.org/zap"
 	"golang.org/x/crypto/acme/autocert"
-	"labile-me-serv/internal/file"
-	"labile-me-serv/pkg/badgerdb"
-	"labile-me-serv/pkg/config"
-	"labile-me-serv/pkg/filesystem"
-	"labile-me-serv/pkg/log"
 )
 
 func main() {

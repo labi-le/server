@@ -1,4 +1,4 @@
-module labile-me-serv
+module github.com/labi-le/server
 
 go 1.19
 

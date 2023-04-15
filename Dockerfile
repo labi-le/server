@@ -22,7 +22,7 @@ RUN apk add busybox ca-certificates
 WORKDIR /app
 
 # Копирование бинарного файла из контейнера сборки в контейнер для запуска
-COPY --from=builder /app/build/package/labile-serv .
+COPY --from=builder /app/build/package/server .
 
 # Запуск приложения
-CMD ["./thief"]
+CMD ["./server"]

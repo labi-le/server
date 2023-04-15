@@ -2,7 +2,7 @@ package response
 
 import (
 	"github.com/gofiber/fiber/v2"
-	"labile-me-serv/pkg/log"
+	"github.com/labi-le/server/pkg/log"
 	"net/http"
 )
 
