@@ -1,9 +1,9 @@
-PUT http://127.0.0.1:8000/version
+PUT http://127.0.0.1:8000/example-video
 Content-Type: multipart/form-data; boundary=boundary
 Authorization: chupapi
 
 --boundary
 Content-Disposition: form-data; name="file"; filename="file"
 
-< ./cat.jpg
+< ./file_example_MP4_480_1_5MG.mp4
 --boundary--

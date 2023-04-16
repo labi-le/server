@@ -1,0 +1,9 @@
+PUT http://127.0.0.1:8000/cat
+Content-Type: multipart/form-data; boundary=boundary
+Authorization: chupapi
+
+--boundary
+Content-Disposition: form-data; name="file"; filename="file"
+
+< ./cat.jpg
+--boundary--
