@@ -13,7 +13,7 @@ require (
 	github.com/spf13/afero v1.9.3
 	github.com/valyala/fasthttp v1.51.0
 	go.uber.org/zap v1.23.0
-	golang.org/x/crypto v0.14.0
+	golang.org/x/crypto v0.17.0
 )
 
 require (
@@ -35,6 +35,6 @@ require (
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sys v0.15.0 // indirect
-	golang.org/x/text v0.13.0 // indirect
+	golang.org/x/text v0.14.0 // indirect
 	google.golang.org/protobuf v1.33.0 // indirect
 )
