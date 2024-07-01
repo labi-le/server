@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/dgraph-io/badger v1.6.0
 	github.com/gabriel-vasile/mimetype v1.4.1
-	github.com/gofiber/fiber/v2 v2.52.1
+	github.com/gofiber/fiber/v2 v2.52.5
 	github.com/google/uuid v1.5.0
 	github.com/philippgille/gokv/encoding v0.0.0-20191011213304-eb77f15b9c61
 	github.com/philippgille/gokv/util v0.0.0-20191011213304-eb77f15b9c61
